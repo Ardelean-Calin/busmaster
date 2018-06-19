@@ -37,7 +37,7 @@ REM cmake -G "Visual Studio 11 2012" -T "v110_xp" ..
 cmake -G "Visual Studio 12 2013" -T "v120"
 
 REM automatically compile solution:
-MSBuild "C:\Users\arc4clj\Documents\Projects\busmaster\Sources\BUSMASTER\BUSMASTER.sln" /property:Configuration=Release
+MSBuild "D:\busmaster\Sources\BUSMASTER\BUSMASTER.sln" /property:Configuration=Release
 
 :END
 REM pause
