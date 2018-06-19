@@ -67,6 +67,7 @@ enum
     DRIVER_CAN_VSCOM,
     DRIVER_CAN_IVIEW,
     DRIVER_CAN_ISOLAR,
+	DRIVER_CAN_OPENCAN,
     DIL_TOTAL,          // Its value must be <= MAX_DILS
     DAL_NONE = ~0x0
 };
@@ -90,6 +91,7 @@ static ENTRY_DIL sg_ListDIL[] =
     {DRIVER_CAN_PEAK_USB,   "&PEAK USB"         },
     {DRIVER_CAN_VECTOR_XL,  "&Vector XL"        },
     {DRIVER_CAN_VSCOM,      "VScom &CAN-API"    },
+	{DRIVER_CAN_OPENCAN, "OPENCAN" },
 };
 
 CDIL_CAN::CDIL_CAN()

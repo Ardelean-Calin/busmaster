@@ -2,6 +2,11 @@
 *~
 *.orig
 
+**/Debug*/*
+**/Release*/*
+**/TestSuiteExecutorGUI/*
+**/DmGraph/*
+
 # Visual Studio intermediate files
 *.aps
 *.APS

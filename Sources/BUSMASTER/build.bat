@@ -15,7 +15,7 @@ goto END
 echo Using MSBuild found in %DOTNET%
 
 :CMAKE_SEARCH
-set CMAKE=%ProgramFiles%\CMake\bin
+set CMAKE=C:\Users\arc4clj\scoop\shims
 if exist "%CMAKE%\cmake.exe" goto CMAKE_FOUND
 
 :CMAKE_NOT_FOUND
@@ -33,11 +33,11 @@ cd build
 
 REM define your compiler/IDE here:
 REM cmake -G "Visual Studio 10 2010" ..
-cmake -G "Visual Studio 11 2012" -T "v110_xp" ..
-REM cmake -G "Visual Studio 12 2013" ..
+REM cmake -G "Visual Studio 11 2012" -T "v110_xp" ..
+cmake -G "Visual Studio 12 2013" -T "v120"
 
 REM automatically compile solution:
-MSBuild "BUSMASTER.sln" /property:Configuration=Release
+MSBuild "C:\Users\arc4clj\Documents\Projects\busmaster\Sources\BUSMASTER\BUSMASTER.sln" /property:Configuration=Release
 
 :END
 REM pause
