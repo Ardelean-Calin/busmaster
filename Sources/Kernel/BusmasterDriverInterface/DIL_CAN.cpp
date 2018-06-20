@@ -67,7 +67,7 @@ enum
     DRIVER_CAN_VSCOM,
     DRIVER_CAN_IVIEW,
     DRIVER_CAN_ISOLAR,
-	DRIVER_CAN_OPENCAN,
+	DRIVER_CAN_OpenCAN,
     DIL_TOTAL,          // Its value must be <= MAX_DILS
     DAL_NONE = ~0x0
 };
@@ -91,7 +91,7 @@ static ENTRY_DIL sg_ListDIL[] =
     {DRIVER_CAN_PEAK_USB,   "&PEAK USB"         },
     {DRIVER_CAN_VECTOR_XL,  "&Vector XL"        },
     {DRIVER_CAN_VSCOM,      "VScom &CAN-API"    },
-	{DRIVER_CAN_OPENCAN, "OPENCAN" },
+	{DRIVER_CAN_OpenCAN,    "OpenCAN" },
 };
 
 CDIL_CAN::CDIL_CAN()
@@ -337,7 +337,8 @@ HRESULT CDIL_CAN::DILC_SelectDriver(DWORD dwDriverID, HWND hWndOwner)
             case DRIVER_CAN_KVASER_CAN:
                 m_hDll = LoadLibrary("CAN_Kvaser_CAN.dll");
                 break;
-
+            
+            case DRIVER_CAN_OpenCAN:
             case DRIVER_CAN_STUB:
                 m_hDll = LoadLibrary("CAN_STUB.dll");
                 break;
