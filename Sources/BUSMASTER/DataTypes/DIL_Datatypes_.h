@@ -97,6 +97,7 @@ enum
     DRIVER_CAN_VSCOM,
     DRIVER_CAN_IVIEW,
     DRIVER_CAN_ISOLAR,
+    DRIVER_CAN_OpenCAN,
     DIL_TOTAL,          // Its value must be <= MAX_DILS
     DAL_NONE            = ~0x0
 };
@@ -205,7 +206,7 @@ public:
     }
 };
 
-const int MAX_DILS = 16;
+const int MAX_DILS = 17;
 const int MAX_HW = 32;
 #define     MAX_DILNAME             32
 typedef DILINFO DILLIST[MAX_DILS];

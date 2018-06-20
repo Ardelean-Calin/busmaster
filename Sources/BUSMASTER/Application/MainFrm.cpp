@@ -195,6 +195,7 @@ enum
     DRIVER_CAN_VSCOM,
     DRIVER_CAN_IVIEW,
     DRIVER_CAN_ISOLAR,
+    DRIVER_CAN_OpenCAN,
     DIL_TOTAL,          // Its value must be <= MAX_DILS
     DAL_NONE = ~0x0
 };
@@ -345,8 +346,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
     ON_UPDATE_COMMAND_UI(IDM_CFGN_REPLAY, OnUpdateCfgnReplay)
     ON_COMMAND(IDM_CONFIGURE_SIMULATEDSYSTEMS, OnConfigureSimulatedsystems)
     ON_COMMAND(IDM_CONFIGURE_SIMULATEDSYSTEMS_LIN, OnConfigureSimulatedsystemsLin)
-    ON_COMMAND_RANGE(IDC_SELECT_DRIVER,IDC_SELECT_DRIVER + 14, OnSelectDriver)
-    ON_UPDATE_COMMAND_UI_RANGE(IDC_SELECT_DRIVER,IDC_SELECT_DRIVER + 14, OnUpdateSelectDriver)
+    ON_COMMAND_RANGE(IDC_SELECT_DRIVER,IDC_SELECT_DRIVER + 15, OnSelectDriver)
+    ON_UPDATE_COMMAND_UI_RANGE(IDC_SELECT_DRIVER,IDC_SELECT_DRIVER + 15, OnUpdateSelectDriver)
     
     
     ON_COMMAND_RANGE(IDC_SELECT_LIN_DRIVER,IDC_SELECT_LIN_DRIVER + 5, OnSelectLINDriver)
@@ -7320,7 +7321,7 @@ void CMainFrame::OnUpdateConfigureModeActive(CCmdUI* pCmdUI)
     if(pCmdUI != nullptr && bConnect == TRUE)
     {
         //Tested with these hardwares only
-        if( m_dwDriverId == DRIVER_CAN_VECTOR_XL || m_dwDriverId == DRIVER_CAN_ICS_NEOVI || m_dwDriverId == DRIVER_CAN_ETAS_ES581 )
+        if( m_dwDriverId == DRIVER_CAN_OpenCAN || m_dwDriverId == DRIVER_CAN_VECTOR_XL || m_dwDriverId == DRIVER_CAN_ICS_NEOVI || m_dwDriverId == DRIVER_CAN_ETAS_ES581 )
         {
             pCmdUI->Enable(TRUE);
         }
@@ -7607,7 +7608,7 @@ void CMainFrame::OnUpdateConfigurePassive(CCmdUI* pCmdUI)
     if(pCmdUI != nullptr && bConnect == TRUE)
     {
         //Tested with these hardwares only
-        if( m_dwDriverId == DRIVER_CAN_VECTOR_XL || m_dwDriverId == DRIVER_CAN_ICS_NEOVI || m_dwDriverId == DRIVER_CAN_ETAS_ES581 )
+        if( m_dwDriverId == DRIVER_CAN_OpenCAN || m_dwDriverId == DRIVER_CAN_VECTOR_XL || m_dwDriverId == DRIVER_CAN_ICS_NEOVI || m_dwDriverId == DRIVER_CAN_ETAS_ES581 )
         {
             pCmdUI->Enable(TRUE);
         }
@@ -13511,6 +13512,10 @@ INT CMainFrame::nGetControllerID(std::string strDriverName)
     else if(strDriverName == "PEAK USB")
     {
         nDriverID = DRIVER_CAN_PEAK_USB;
+    }
+    else if(strDriverName == "OpenCAN")
+    {
+        nDriverID = DRIVER_CAN_OpenCAN;
     }
     else
     {
