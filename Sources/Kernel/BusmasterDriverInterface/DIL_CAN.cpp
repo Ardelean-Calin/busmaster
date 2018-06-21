@@ -338,7 +338,6 @@ HRESULT CDIL_CAN::DILC_SelectDriver(DWORD dwDriverID, HWND hWndOwner)
                 m_hDll = LoadLibrary("CAN_Kvaser_CAN.dll");
                 break;
             
-            case DRIVER_CAN_OpenCAN:
             case DRIVER_CAN_STUB:
                 m_hDll = LoadLibrary("CAN_STUB.dll");
                 break;
@@ -351,6 +350,7 @@ HRESULT CDIL_CAN::DILC_SelectDriver(DWORD dwDriverID, HWND hWndOwner)
                 m_hDll = LoadLibrary("CAN_NSI.dll");
                 break;
 
+			case DRIVER_CAN_OpenCAN:
             case DRIVER_CAN_VSCOM:
                 m_hDll = LoadLibrary("CAN_VSCOM.dll");
                 break;

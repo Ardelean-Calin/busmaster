@@ -9559,6 +9559,7 @@ HRESULT CMainFrame::IntializeDIL(UINT unDefaultChannelCnt, bool bLoadedFromXml)
                 }
             }
         }
+		// Here is where the default DIL interface for the session is set
         m_objTxHandler.vSetDILInterfacePtr(CAN,(void*)g_pouDIL_CAN_Interface);
         m_objTxHandler.vSetClientID(CAN,g_dwClientID);
 		vUpdateChannelInfo(); 

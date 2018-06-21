@@ -473,6 +473,7 @@ HRESULT PerformAnOperation(BYTE bActionCode)
         // Now release the harness
         SetEvent ( sg_sBrokerObjBusEmulation.m_hActionEvent );
         // Wait until current assignment of broker thread is over
+		// It hangs here
         WaitForSingleObject ( sg_hNotifyFinish, INFINITE );
         // Save the result
         hResult = sg_hResult;
