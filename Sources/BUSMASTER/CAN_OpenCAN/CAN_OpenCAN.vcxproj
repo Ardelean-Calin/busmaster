@@ -80,7 +80,7 @@
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)\EXTERNAL\libxml2\lib;$(SolutionDir)\EXTERNAL\zlib\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\EXTERNAL\zlib\include;$(SolutionDir)\EXTERNAL\libxml2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\EXTERNAL\;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\EXTERNAL\zlib\include;$(SolutionDir)\EXTERNAL\libxml2\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)\EXTERNAL\libxml2\lib;$(SolutionDir)\EXTERNAL\zlib\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -91,7 +91,7 @@
     <ClCompile>
       <AdditionalOptions>/I "$(SolutionDir)/Localization/include" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath);..\EXTERNAL\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\EXTERNAL;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath);..\EXTERNAL\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -108,10 +108,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>"$(SolutionDir)/BIN/Libs/$(OutDir)DataTypes.lib"
-"$(SolutionDir)/BIN/Libs/$(OutDir)Utils.lib"
- %(AdditionalOptions)</AdditionalOptions>
+"$(SolutionDir)/BIN/Libs/$(OutDir)Utils.lib" %(AdditionalOptions)</AdditionalOptions>
       <OutputFile>$(SolutionDir)/bin/$(OutDir)CAN_OpenCAN.dll</OutputFile>
-      <AdditionalLibraryDirectories>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(ProjectDir)/EXTERNAL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -122,6 +121,8 @@
       <ImportLibrary>$(SolutionDir)/BIN/Libs/$(OutDir)CAN_OpenCAN.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ProgramDatabaseFile>$(SolutionDir)/bin/DumpFiles/$(IntDir)/PDB/$(TargetName).pdb</ProgramDatabaseFile>
+      <AdditionalDependencies>"$(SolutionDir)CAN_OpenCAN\EXTERNAL\opencan.lib"</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

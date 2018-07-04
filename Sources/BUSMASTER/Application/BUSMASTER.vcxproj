@@ -544,7 +544,6 @@ copy ".\Res\Splsh16.bmp" "$(SolutionDir)\bin\$(OutDir)Splsh16.bmp"
     <ClCompile Include="J1939TimeOutCfg.cpp" />
     <ClCompile Include="LINBusStatisticsDlg.cpp" />
     <ClCompile Include="LINSignalExtractor.cpp" />
-    
     <ClCompile Include="MainFrm.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1002,7 +1001,6 @@ copy ".\Res\Splsh16.bmp" "$(SolutionDir)\bin\$(OutDir)Splsh16.bmp"
     <ClInclude Include="LINBusStatisticsDlg.h" />
     <ClInclude Include="LinChannelParam.h" />
     <ClInclude Include="LINSignalExtractor.h" />
-    
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MDIChildBase.h" />
     <ClInclude Include="MessageAttrib.h" />

@@ -24,6 +24,7 @@
 /* C++ includes */
 #include <string>
 #include <vector>
+#include <stdio.h>
 
 /* Project includes */
 #include "CAN_OpenCAN_stdafx.h"
@@ -45,8 +46,10 @@
 
 //#include "DIL_Interface/BaseDIL_CAN_Controller.h"
 //#include "../Application/GettextBusmaster.h"
+//#include "EXTERNAL\OpenCAN_api.h"
 
 #include "Utility\MultiLanguageSupport.h"
+#include "OpenCAN_api.h"
 
 #define USAGE_EXPORT
 #include "CAN_OpenCAN_Extern.h"
@@ -89,6 +92,7 @@ static SYSTEMTIME       sg_CurrSysTime = { '\0' };
 static LARGE_INTEGER    sg_QueryTickCount;
 static UINT64           sg_TimeStampRef = 0x0;
 static HWND             sg_hOwnerWnd = nullptr;
+static HANDLE			hcan;
 
 /**
 * Broker thread for the bus emulation
@@ -237,6 +241,7 @@ static CDIL_CAN_STUB* sg_pouDIL_CAN_STUB = nullptr;
 */
 USAGEMODE HRESULT GetIDIL_CAN_Controller(void** ppvInterface)
 {
+	//HERE
 	HRESULT hResult = S_OK;
 	if (nullptr == sg_pouDIL_CAN_STUB)
 	{
@@ -723,12 +728,16 @@ HRESULT CDIL_CAN_STUB::CAN_ManageMsgBuf(BYTE bAction, DWORD ClientID, CBaseCANBu
 
 HRESULT CDIL_CAN_STUB::CAN_StopHardware(void)
 {
+	OpenCAN_Close(hcan);
+	return S_OK;
+	/*
 	HRESULT hResult = PerformAnOperation(DISCONNECT);
 	if (hResult == S_OK)
 	{
 		hResult = PerformAnOperation(STOP_HARDWARE);
 	}
 	return hResult;
+	*/
 }
 
 HRESULT CDIL_CAN_STUB::CAN_SetConfigData(PSCONTROLLER_DETAILS ConfigFile, int /*Length*/)
@@ -763,17 +772,36 @@ HRESULT CDIL_CAN_STUB::CAN_SetConfigData(PSCONTROLLER_DETAILS ConfigFile, int /*
 
 HRESULT CDIL_CAN_STUB::CAN_StartHardware(void)
 {
-	//First stop the hardware
-	HRESULT hResult = PerformAnOperation(CONNECT);
+	// HRESULT hResult;
+
+	hcan = OpenCAN_Open("COM3");
+	if (hcan == NULL)
+		return S_FALSE;
+	else
+		return S_OK;
+	/*
 	if (hResult == S_OK)
 	{
 		hResult = PerformAnOperation(START_HARDWARE);
 	}
 	return hResult;
+	*/
 }
 
 HRESULT CDIL_CAN_STUB::CAN_SendMsg(DWORD dwClientID, const STCAN_MSG& sCanTxMsg)
 {
+
+	CANMsg_Standard_t txMsg;
+
+	txMsg.msgID = (uint16_t)sCanTxMsg.m_unMsgID;
+	txMsg.DLC = (uint8_t)sCanTxMsg.m_ucDataLen;
+	memcpy((void*)txMsg.Data, (void*)sCanTxMsg.m_ucData, 8);
+
+	OpenCAN_WriteCAN(hcan, &txMsg);
+	
+	return S_OK;
+
+	/*
 	HRESULT hResult = S_FALSE;
 
 	// Lock so that no other thread may use the common resources
@@ -796,6 +824,7 @@ HRESULT CDIL_CAN_STUB::CAN_SendMsg(DWORD dwClientID, const STCAN_MSG& sCanTxMsg)
 	LeaveCriticalSection(&sg_CSBroker);
 
 	return hResult;
+	*/
 }
 
 HRESULT CDIL_CAN_STUB::CAN_GetCntrlStatus(const HANDLE& /*hEvent*/, UINT& unCntrlStatus)
