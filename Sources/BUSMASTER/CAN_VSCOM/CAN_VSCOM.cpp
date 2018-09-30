@@ -887,7 +887,8 @@ HRESULT CDIL_CAN_VSCOM::CAN_StartHardware(void)
                 return (S_FALSE);
             }
         }
-
+        
+        // TODO: Look here for RX code
         sg_hEventRecv = CreateEvent(nullptr, FALSE, FALSE, nullptr);
         if (sg_hEventRecv == nullptr)
         {
@@ -904,6 +905,7 @@ HRESULT CDIL_CAN_VSCOM::CAN_StartHardware(void)
         {
             hResult = S_FALSE;
         }
+        // END TODO
 
         hResult = S_OK;
 

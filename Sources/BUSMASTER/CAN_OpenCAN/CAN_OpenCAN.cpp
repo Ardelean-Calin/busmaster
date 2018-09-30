@@ -94,10 +94,12 @@ static UINT64           sg_TimeStampRef = 0x0;
 static HWND             sg_hOwnerWnd = nullptr;
 static HANDLE			hcan;
 
+#define CALLBACK_TYPE __stdcall
 /**
 * Broker thread for the bus emulation
 */
 static CPARAM_THREADPROC sg_sBrokerObjBusEmulation;
+DWORD WINAPI CanWaitForRx(LPVOID);
 
 /**
 * Different action codes
@@ -184,6 +186,11 @@ static HANDLE sg_hTmpPipeHandle = nullptr;
 * Buffer for the driver operation related error messages
 */
 static std::string sg_acErrStr;
+
+// Handles and ID related to RX
+static HANDLE sg_hEventRecv = nullptr;
+static HANDLE sg_hReadThread = nullptr;
+static DWORD sg_dwReadThreadId = 0;
 
 /**
 * Starts code for the state machine
@@ -728,6 +735,25 @@ HRESULT CDIL_CAN_STUB::CAN_ManageMsgBuf(BYTE bAction, DWORD ClientID, CBaseCANBu
 
 HRESULT CDIL_CAN_STUB::CAN_StopHardware(void)
 {
+	if (sg_hReadThread != nullptr)
+    {
+        TerminateThread(sg_hReadThread, 0);
+        sg_hReadThread = nullptr;
+    }
+
+  //   if (sg_hEventRecv != nullptr)
+  //   {
+  //       CloseHandle(sg_hEventRecv);
+  //       sg_hEventRecv = nullptr;
+  //   }
+
+  //   if (sg_VSCanCfg.hCan > 0)
+  //   {
+  //       VSCAN_Close(sg_VSCanCfg.hCan);
+  //       sg_VSCanCfg.hCan = 0;
+  //   }
+
+  //   return(S_OK);
 	OpenCAN_Close(hcan);
 	return S_OK;
 	/*
@@ -770,61 +796,53 @@ HRESULT CDIL_CAN_STUB::CAN_SetConfigData(PSCONTROLLER_DETAILS ConfigFile, int /*
 	return S_OK;
 }
 
+DWORD WINAPI CanWaitForRx(LPVOID)
+{
+	CANMsg_Standard_t rxMsg;
+	uint8_t error;
+	for (;;)
+	{
+		// TODO: I am not be able to write while reading... Semaphores/Locks?
+		error = OpenCAN_ReadCAN(hcan, &rxMsg);
+		if (error)
+		{
+			// Show error frame?
+			continue;
+		}		
+		// TODO: There will be multiple messages in buffer. I can read them one by one? Might need a message
+		// storer thread in OpenCAN
+		Sleep(100);
+	}
+}
+
 HRESULT CDIL_CAN_STUB::CAN_StartHardware(void)
 {
-	// HRESULT hResult;
-
 	hcan = OpenCAN_Open("COM3");
 	if (hcan == NULL)
-		return S_FALSE;
-	else
-		return S_OK;
-	/*
-	if (hResult == S_OK)
 	{
-		hResult = PerformAnOperation(START_HARDWARE);
+		return ERR_LOAD_HW_INTERFACE;
 	}
-	return hResult;
-	*/
+	else
+	{
+		// Create receive thread
+		sg_hReadThread = CreateThread(nullptr, 0, CanWaitForRx, nullptr, 0, &sg_dwReadThreadId);
+		return S_OK;
+	}
 }
 
 HRESULT CDIL_CAN_STUB::CAN_SendMsg(DWORD dwClientID, const STCAN_MSG& sCanTxMsg)
 {
 
 	CANMsg_Standard_t txMsg;
+	memset((void*)txMsg.Data, 0U, 8);
 
 	txMsg.msgID = (uint16_t)sCanTxMsg.m_unMsgID;
 	txMsg.DLC = (uint8_t)sCanTxMsg.m_ucDataLen;
-	memcpy((void*)txMsg.Data, (void*)sCanTxMsg.m_ucData, 8);
+	memcpy((void*)txMsg.Data, (void*)sCanTxMsg.m_ucData, txMsg.DLC);
 
 	OpenCAN_WriteCAN(hcan, &txMsg);
 	
 	return S_OK;
-
-	/*
-	HRESULT hResult = S_FALSE;
-
-	// Lock so that no other thread may use the common resources
-	EnterCriticalSection(&sg_CSBroker);
-
-	// Assign parameter
-	STCAN_MSG sTmpMsg = sCanTxMsg;
-	sg_pouCanTxMsg = &sTmpMsg;
-	sg_ushTempClientID = (USHORT)dwClientID;
-	// Identify current assignment of the broker thread
-	sg_sBrokerObjBusEmulation.m_unActionCode = SEND_MESSAGE;
-	// Now release the harness
-	SetEvent(sg_sBrokerObjBusEmulation.m_hActionEvent);
-	// Wait until current assignment of broker thread is over
-	WaitForSingleObject(sg_hNotifyFinish, INFINITE);
-	// Save the result
-	hResult = sg_hResult;
-
-	// Work is over, now unlock for others to use common resources
-	LeaveCriticalSection(&sg_CSBroker);
-
-	return hResult;
-	*/
 }
 
 HRESULT CDIL_CAN_STUB::CAN_GetCntrlStatus(const HANDLE& /*hEvent*/, UINT& unCntrlStatus)
