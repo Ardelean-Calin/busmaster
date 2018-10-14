@@ -35,7 +35,8 @@
 //#include "Include/CanUSBDefs.h"
 //#include "Include/DIL_CommonDefs.h"
 
-//#include "DataTypes/MsgBufAll_DataTypes.h"
+// #include "DataTypes/MsgBufAll_DataTypes.h"
+#include "MsgBufFSE.h"
 #include "BusEmulation/BusEmulation.h"
 #include "BusEmulation/BusEmulation_i.c"
 //#include "DataTypes/DIL_DataTypes.h"
@@ -54,9 +55,16 @@
 #define USAGE_EXPORT
 #include "CAN_OpenCAN_Extern.h"
 
+typedef struct {
+	DWORD dwClientID;
+	uint8_t* ucBuffer;
+} xClient_t;
+
 
 /* Global parameters */
 static HANDLE			hcan;
+static xClient_t xClient;
+CBaseCANBufFSE* xMsgBuf;
 
 #define CALLBACK_TYPE __stdcall
 
@@ -121,19 +129,35 @@ DWORD WINAPI CanWaitForRx(LPVOID);
 DWORD WINAPI CanWaitForRx(LPVOID)
 {
 	CANMsg_Standard_t rxMsg;
-	uint8_t error;
+    STCAN_MSG sCanRxMsg;
+	uint8_t ucBytesRead;
 	for (;;)
 	{
 		// TODO: I am not be able to write while reading... Semaphores/Locks?
-		error = OpenCAN_ReadCAN(hcan, &rxMsg);
-		if (error)
+		ucBytesRead = OpenCAN_ReadCAN(hcan, &rxMsg);
+        
+		if (ucBytesRead)
+        {
+            STCANDATA data;
+
+			// Create RX message structure
+			sCanRxMsg.m_bCANFD = false;
+			sCanRxMsg.m_ucChannel = 1;
+			memcpy(sCanRxMsg.m_ucData, rxMsg.Data, rxMsg.DLC);
+			sCanRxMsg.m_ucDataLen = rxMsg.DLC;
+			sCanRxMsg.m_ucEXTENDED = false;
+			sCanRxMsg.m_unMsgID = rxMsg.msgID;
+
+            data.m_lTickCount.QuadPart = GetTickCount64() * 10;
+			data.m_uDataInfo.m_sCANMsg = sCanRxMsg;
+            data.m_ucDataType = RX_FLAG;
+            xMsgBuf->WriteIntoBuffer(&data);
+        }
+        else
 		{
 			// Show error frame?
 			continue;
 		}		
-		// TODO: There will be multiple messages in buffer. I can read them one by one? Might need a message
-		// storer thread in OpenCAN
-		Sleep(100);
 	}
 }
 
@@ -176,7 +200,14 @@ HRESULT CDIL_CAN_OPENCAN::CAN_SendMsg(DWORD dwClientID, const STCAN_MSG& sCanTxM
 	memcpy((void*)txMsg.Data, (void*)sCanTxMsg.m_ucData, txMsg.DLC);
 
 	OpenCAN_WriteCAN(hcan, &txMsg);
-	
+
+    // Write into the client message buffer, to be displayed in the message window
+    STCANDATA data;
+	data.m_lTickCount.QuadPart = GetTickCount64()*10;
+	data.m_uDataInfo.m_sCANMsg = sCanTxMsg;
+	data.m_ucDataType = TX_FLAG;
+	xMsgBuf->WriteIntoBuffer(&data);	
+
 	return S_OK;
 }
 
@@ -255,13 +286,33 @@ HRESULT CDIL_CAN_OPENCAN::CAN_SetAppParams(HWND hWndOwner)
     return S_OK;
 }
 
+/**
+* \brief         Registers the buffer pBufObj to the client ClientID
+* \param[in]     bAction, contains one of the values MSGBUF_ADD or MSGBUF_CLEAR
+* \param[in]     ClientID, is the client ID
+* \param[in]     pBufObj, is pointer to CBaseCANBufFSE object
+* \return        S_OK for success, S_FALSE for failure
+* \authors       Arunkumar Karri
+* \date          07.10.2011 Created
+*/
 HRESULT CDIL_CAN_OPENCAN::CAN_ManageMsgBuf(BYTE bAction, DWORD ClientID, CBaseCANBufFSE* pBufObj)
 {
+	xMsgBuf = pBufObj;
     return S_OK;
 }
 
+
 HRESULT CDIL_CAN_OPENCAN::CAN_RegisterClient(BOOL bRegister, DWORD& ClientID, char* pacClientName)
 {
+    if (bRegister)
+    {
+        // Only one client allowed
+        ClientID = xClient.dwClientID = 0;
+    }
+    else
+    {
+        // TODO: unregister
+    }
     return S_OK;
 }
 
