@@ -6,23 +6,26 @@
 #include <stddef.h>
 
 /* Defines */
-#define TX_MSG_DEC_SIZE (11)
-#define TX_MSG_ENC_SIZE (TX_MSG_DEC_SIZE + 2)
-#define RX_MSG_ENC_SIZE (12)
-#define RX_MSG_DEC_SIZE (RX_MSG_ENC_SIZE - 2)
+// Fixed packet size for USB messages
+#define USB_DEC_PACKET_SIZE (16U)
+#define USB_ENC_PACKET_SIZE (USB_DEC_PACKET_SIZE + 2)
 
 /* Typedefs and enums */
 typedef struct
 {
-    uint16_t msgID;
+    uint32_t msgID;
+    uint8_t isExtended;
     uint8_t DLC;
     uint8_t Data[8];
 } CANMsg_Standard_t;
 
 enum
 {
-    CAN_WRITE_MSG = 0,
-    CAN_CHANGE_BAUDRATE
+    TX_CAN_SEND = 0,
+    RX_CAN_RECV,
+    TX_ACK_REQUEST,
+    RX_ACK_SEND,
+    TX_CAN_SET_BAUDRATE
 };
 
 #ifdef __cplusplus

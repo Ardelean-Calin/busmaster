@@ -65,6 +65,7 @@ typedef struct {
 static HANDLE			hcan;
 static xClient_t xClient;
 CBaseCANBufFSE* xMsgBuf;
+static DWORD startTimestamp;
 
 #define CALLBACK_TYPE __stdcall
 
@@ -145,10 +146,10 @@ DWORD WINAPI CanWaitForRx(LPVOID)
 			sCanRxMsg.m_ucChannel = 1;
 			memcpy(sCanRxMsg.m_ucData, rxMsg.Data, rxMsg.DLC);
 			sCanRxMsg.m_ucDataLen = rxMsg.DLC;
-			sCanRxMsg.m_ucEXTENDED = false;
+			sCanRxMsg.m_ucEXTENDED = rxMsg.isExtended;
 			sCanRxMsg.m_unMsgID = rxMsg.msgID;
 
-            data.m_lTickCount.QuadPart = GetTickCount64() * 10;
+            data.m_lTickCount.QuadPart = (GetTickCount() - startTimestamp) * 10;
 			data.m_uDataInfo.m_sCANMsg = sCanRxMsg;
             data.m_ucDataType = RX_FLAG;
             xMsgBuf->WriteIntoBuffer(&data);
@@ -173,6 +174,7 @@ HRESULT CDIL_CAN_OPENCAN::CAN_StartHardware(void)
 	{
 		// Create receive thread
 		sg_hReadThread = CreateThread(nullptr, 1000, CanWaitForRx, nullptr, 0, &sg_dwReadThreadId);
+		startTimestamp = GetTickCount();
 		return S_OK;
 	}
 }
@@ -197,13 +199,14 @@ HRESULT CDIL_CAN_OPENCAN::CAN_SendMsg(DWORD dwClientID, const STCAN_MSG& sCanTxM
 
 	txMsg.msgID = (uint16_t)sCanTxMsg.m_unMsgID;
 	txMsg.DLC = (uint8_t)sCanTxMsg.m_ucDataLen;
+	txMsg.isExtended = (uint8_t)sCanTxMsg.m_ucEXTENDED;
 	memcpy((void*)txMsg.Data, (void*)sCanTxMsg.m_ucData, txMsg.DLC);
 
 	OpenCAN_WriteCAN(hcan, &txMsg);
 
     // Write into the client message buffer, to be displayed in the message window
     STCANDATA data;
-	data.m_lTickCount.QuadPart = GetTickCount64()*10;
+	data.m_lTickCount.QuadPart = (GetTickCount() - startTimestamp) * 10;
 	data.m_uDataInfo.m_sCANMsg = sCanTxMsg;
 	data.m_ucDataType = TX_FLAG;
 	xMsgBuf->WriteIntoBuffer(&data);	
