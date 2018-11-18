@@ -35,8 +35,9 @@ extern "C"
     /*
  * Function prototypes 
  */
-    void *OpenCAN_Open(char *portName);
-    void OpenCAN_Close(HANDLE handle);
+
+    uint8_t OpenCAN_Open(HANDLE *hSerialPort, uint8_t *pucCOMNumber);
+    void OpenCAN_Close(HANDLE hSerialPort);
     uint8_t OpenCAN_WriteCAN(HANDLE hSerialPort, CANMsg_Standard_t *txMsg);
     uint8_t OpenCAN_ReadCAN(HANDLE hSerialPort, CANMsg_Standard_t *rxMsg);
 #ifdef __cplusplus

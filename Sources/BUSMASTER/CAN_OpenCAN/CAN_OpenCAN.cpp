@@ -165,8 +165,9 @@ DWORD WINAPI CanWaitForRx(LPVOID)
 
 HRESULT CDIL_CAN_OPENCAN::CAN_StartHardware(void)
 {
-	hcan = OpenCAN_Open("COM3");
-	if (hcan == NULL)
+	uint8_t comport;
+	uint8_t error = OpenCAN_Open(&hcan, &comport);
+	if (error)
 	{
 		return ERR_LOAD_HW_INTERFACE;
 	}
