@@ -47,10 +47,8 @@
 
 //#include "DIL_Interface/BaseDIL_CAN_Controller.h"
 //#include "../Application/GettextBusmaster.h"
-//#include "EXTERNAL\OpenCAN_api.h"
-
-#include "Utility\MultiLanguageSupport.h"
 #include "OpenCAN_api.h"
+#include "Utility\MultiLanguageSupport.h"
 
 #define USAGE_EXPORT
 #include "CAN_OpenCAN_Extern.h"
@@ -64,8 +62,15 @@ typedef struct {
 /* Global parameters */
 static HANDLE			hcan;
 static xClient_t xClient;
-CBaseCANBufFSE* xMsgBuf;
+static int lastIndex = 0;
+CBaseCANBufFSE* xMsgBuf[16];
 static DWORD startTimestamp;
+static CPARAM_THREADPROC sg_sParmRThread;
+static CRITICAL_SECTION sg_DIL_CriticalSection;
+
+HANDLE hActionEvent = nullptr;
+
+DWORD WINAPI CanWaitForRx(LPVOID pVoid);
 
 #define CALLBACK_TYPE __stdcall
 
@@ -125,22 +130,20 @@ USAGEMODE HRESULT GetIDIL_CAN_Controller(void** ppvInterface)
 
     return(hResult);
 }
+static STCANDATA sg_asCANMsg;
 
-DWORD WINAPI CanWaitForRx(LPVOID);
-DWORD WINAPI CanWaitForRx(LPVOID)
+DWORD WINAPI CanWaitForRx(LPVOID pVoid)
 {
 	CANMsg_Standard_t rxMsg;
     STCAN_MSG sCanRxMsg;
 	uint8_t ucBytesRead;
+
 	for (;;)
 	{
-		// TODO: I am not be able to write while reading... Semaphores/Locks?
 		ucBytesRead = OpenCAN_ReadCAN(hcan, &rxMsg);
-        
-		if (ucBytesRead)
-        {
-            STCANDATA data;
 
+		if (ucBytesRead)
+		{
 			// Create RX message structure
 			sCanRxMsg.m_bCANFD = false;
 			sCanRxMsg.m_ucChannel = 1;
@@ -149,17 +152,28 @@ DWORD WINAPI CanWaitForRx(LPVOID)
 			sCanRxMsg.m_ucEXTENDED = rxMsg.isExtended;
 			sCanRxMsg.m_unMsgID = rxMsg.msgID;
 
-            data.m_lTickCount.QuadPart = (GetTickCount() - startTimestamp) * 10;
-			data.m_uDataInfo.m_sCANMsg = sCanRxMsg;
-            data.m_ucDataType = RX_FLAG;
-            xMsgBuf->WriteIntoBuffer(&data);
-        }
-        else
+			sg_asCANMsg.m_lTickCount.QuadPart = (GetTickCount() - startTimestamp) * 10;
+			sg_asCANMsg.m_uDataInfo.m_sCANMsg = sCanRxMsg;
+			sg_asCANMsg.m_ucDataType = RX_FLAG;
+			EnterCriticalSection(&sg_DIL_CriticalSection);
+			
+			for(int i = 0; i < 7; i++)
+			{
+				/* code */
+				xMsgBuf[i]->WriteIntoBuffer(&sg_asCANMsg);
+			}
+			
+			LeaveCriticalSection(&sg_DIL_CriticalSection);
+			// SetEvent(hActionEvent);
+		}
+		else
 		{
 			// Show error frame?
 			continue;
 		}		
 	}
+
+	return 0;
 }
 
 
@@ -173,9 +187,12 @@ HRESULT CDIL_CAN_OPENCAN::CAN_StartHardware(void)
 	}
 	else
 	{
+		// sg_hEventRecv = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		// Create receive thread
 		sg_hReadThread = CreateThread(nullptr, 1000, CanWaitForRx, nullptr, 0, &sg_dwReadThreadId);
+		// xMsgBuf->vClearMessageBuffer();
 		startTimestamp = GetTickCount();
+		// sg_sParmRThread.bStartThread(CanWaitForRx);
 		return S_OK;
 	}
 }
@@ -188,6 +205,8 @@ HRESULT CDIL_CAN_OPENCAN::CAN_StopHardware(void)
         TerminateThread(sg_hReadThread, 0);
         sg_hReadThread = nullptr;
     }
+	// Terminate read thread
+	// sg_sParmRThread.bTerminateThread();
 	OpenCAN_Close(hcan);
 	return S_OK;
 }
@@ -210,18 +229,33 @@ HRESULT CDIL_CAN_OPENCAN::CAN_SendMsg(DWORD dwClientID, const STCAN_MSG& sCanTxM
 	data.m_lTickCount.QuadPart = (GetTickCount() - startTimestamp) * 10;
 	data.m_uDataInfo.m_sCANMsg = sCanTxMsg;
 	data.m_ucDataType = TX_FLAG;
-	xMsgBuf->WriteIntoBuffer(&data);	
+	EnterCriticalSection(&sg_DIL_CriticalSection);
+	for(int i = 0; i < 7; i++)
+	{
+		/* code */
+		xMsgBuf[i]->WriteIntoBuffer(&data);
+	}
+	// xMsgBuf->WriteIntoBuffer(&data);	
+	LeaveCriticalSection(&sg_DIL_CriticalSection);
 
 	return S_OK;
 }
 
 HRESULT CDIL_CAN_OPENCAN::CAN_PerformInitOperations(void)
 {
+	DWORD dwClientID = 0;
+	
+	// sg_sParmRThread.m_hActionEvent = CreateEvent(nullptr, false,
+    //             false, nullptr);
+	// ResetEvent(sg_sParmRThread.m_hActionEvent);
+	InitializeCriticalSection(&sg_DIL_CriticalSection);
+    CAN_RegisterClient(TRUE, dwClientID, CAN_MONITOR_NODE);
     return S_OK;
 }
 
 HRESULT CDIL_CAN_OPENCAN::CAN_PerformClosureOperations(void)
 {
+	DeleteCriticalSection(&sg_DIL_CriticalSection);
     return S_OK;
 }
 
@@ -252,6 +286,7 @@ HRESULT CDIL_CAN_OPENCAN::CAN_SetConfigData(PSCONTROLLER_DETAILS InitData, int L
 
 HRESULT CDIL_CAN_OPENCAN::CAN_GetCurrStatus(STATUSMSG &StatusData)
 {
+	StatusData.wControllerStatus = NORMAL_ACTIVE;
     return S_OK;
 }
 
@@ -287,6 +322,8 @@ HRESULT CDIL_CAN_OPENCAN::CAN_GetErrorCount(SERROR_CNT &sErrorCnt, UINT nChannel
 
 HRESULT CDIL_CAN_OPENCAN::CAN_SetAppParams(HWND hWndOwner)
 {
+	// hWndOwner contains the window => Useful for UI development
+	CAN_ManageMsgBuf(MSGBUF_CLEAR, 0, nullptr);
     return S_OK;
 }
 
@@ -301,7 +338,14 @@ HRESULT CDIL_CAN_OPENCAN::CAN_SetAppParams(HWND hWndOwner)
 */
 HRESULT CDIL_CAN_OPENCAN::CAN_ManageMsgBuf(BYTE bAction, DWORD ClientID, CBaseCANBufFSE* pBufObj)
 {
-	xMsgBuf = pBufObj;
+	if (bAction == MSGBUF_ADD)
+	{
+		xMsgBuf[lastIndex] = pBufObj;
+		lastIndex++;
+	} else if (bAction == MSGBUF_CLEAR)
+	{
+		// xMsgBuf = nullptr;
+	}
     return S_OK;
 }
 
@@ -311,7 +355,7 @@ HRESULT CDIL_CAN_OPENCAN::CAN_RegisterClient(BOOL bRegister, DWORD& ClientID, ch
     if (bRegister)
     {
         // Only one client allowed
-        ClientID = xClient.dwClientID = 0;
+        ClientID = xClient.dwClientID = 1;
     }
     else
     {

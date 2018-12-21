@@ -1,0 +1,26 @@
+set(sources
+  CAN_OpenCAN.cpp
+  ../Application/MultiLanguage.cpp)
+
+set(headers
+  CAN_OpenCAN.h
+  CAN_OpenCAN_Extern.h
+  CAN_OpenCAN_stdafx.h
+  EXTERNAL/OpenCAN_api.h
+  ../Application/MultiLanguage.h)
+
+include_directories(
+  ..
+  ${ICONV_INCLUDE_DIR}
+  ${LIBXML2_INCLUDE_DIR}
+  ${ATL_INCLUDE_DIRS}
+  ${MFC_INCLUDE_DIRS})
+
+# compiler options
+add_definitions(-D_USRDLL)
+
+set_target_properties(CAN_OpenCAN PROPERTIES LINK_FLAGS "/NODEFAULTLIB:daouuid")
+target_link_libraries(CAN_OpenCAN
+  ${CMAKE_CURRENT_SOURCE_DIR}/EXTERNAL/opencan.lib
+  DataTypes
+  Utils)

@@ -356,9 +356,9 @@ HRESULT CDIL_CAN::DILC_SelectDriver(DWORD dwDriverID, HWND hWndOwner)
             case DRIVER_CAN_VSCOM:
                 m_hDll = LoadLibrary("CAN_VSCOM.dll");
                 break;
-            case DRIVER_CAN_ISOLAR:
+            /*case DRIVER_CAN_ISOLAR:
                 m_hDll = LoadLibrary("CAN_ISOLAR_EVE_VCAN.dll");
-                break;
+                break;*/
             case DAL_NONE:
                 DILC_PerformClosureOperations();
                 vSelectInterface_Dummy();

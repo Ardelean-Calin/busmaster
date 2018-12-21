@@ -5598,6 +5598,7 @@ bool CMainFrame::bStopGraphReadThread()
 /* routine to read the data from buffer */
 INT CMainFrame::ReadGraphDataBuffer(bool bCalcTime)
 {
+	// TODO. This is not called.
     static STCANDATA sCanData;
     if (bCalcTime)
     {
