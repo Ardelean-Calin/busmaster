@@ -3,11 +3,11 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.00.0603 */
-/* at Fri Dec 21 13:57:53 2018
+ /* File created by MIDL compiler version 7.00.0555 */
+/* at Fri Dec 21 15:48:50 2018
  */
 /* Compiler settings for BUSMASTER.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
@@ -44,14 +44,12 @@
 #ifndef ___IAppEvents_FWD_DEFINED__
 #define ___IAppEvents_FWD_DEFINED__
 typedef interface _IAppEvents _IAppEvents;
-
 #endif 	/* ___IAppEvents_FWD_DEFINED__ */
 
 
 #ifndef __IBusMasterApp_FWD_DEFINED__
 #define __IBusMasterApp_FWD_DEFINED__
 typedef interface IBusMasterApp IBusMasterApp;
-
 #endif 	/* __IBusMasterApp_FWD_DEFINED__ */
 
 
@@ -70,7 +68,6 @@ typedef struct BusMasterApp BusMasterApp;
 #ifndef __ICANComm_FWD_DEFINED__
 #define __ICANComm_FWD_DEFINED__
 typedef interface ICANComm ICANComm;
-
 #endif 	/* __ICANComm_FWD_DEFINED__ */
 
 
@@ -89,7 +86,6 @@ typedef struct Comm Comm;
 #ifndef __ICANLog_FWD_DEFINED__
 #define __ICANLog_FWD_DEFINED__
 typedef interface ICANLog ICANLog;
-
 #endif 	/* __ICANLog_FWD_DEFINED__ */
 
 
@@ -123,68 +119,60 @@ extern "C"{
 
 typedef /* [public][public][public][public][public][public][public][version][uuid] */  DECLSPEC_UUID("B78C73E2-4F4D-42C1-AF94-04D1AA8C6410") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0001
-    {
-        None	= 0,
-        Start	= ( None + 1 ) ,
-        Stop	= ( Start + 1 ) ,
-        Both	= ( Stop + 1 ) ,
-        Stopped	= ( Both + 1 ) 
+    {	None	= 0,
+	Start	= ( None + 1 ) ,
+	Stop	= ( Start + 1 ) ,
+	Both	= ( Stop + 1 ) ,
+	Stopped	= ( Both + 1 ) 
     } 	eLoggingTriggerState;
 
 typedef /* [public][public][public][public][public][version][uuid] */  DECLSPEC_UUID("194345BB-4E5D-4A96-8A35-EBF3FCA06E8E") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0002
-    {
-        System	= 0,
-        Absolute	= ( System + 1 ) ,
-        Relative	= ( Absolute + 1 ) 
+    {	System	= 0,
+	Absolute	= ( System + 1 ) ,
+	Relative	= ( Absolute + 1 ) 
     } 	eTimeMode;
 
 typedef /* [public][public][public][public][public][version][uuid] */  DECLSPEC_UUID("87458EB5-7047-4C71-A569-606110E60230") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0003
-    {
-        Hex	= 0,
-        Deci	= ( Hex + 1 ) 
+    {	Hex	= 0,
+	Deci	= ( Hex + 1 ) 
     } 	eNumericMode;
 
 typedef /* [public][public][public][public][public][version][uuid] */  DECLSPEC_UUID("11FA404A-0517-4B9E-9B86-BEC3AF44E2F1") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0004
-    {
-        Append	= 0,
-        OverWrite	= ( Append + 1 ) 
+    {	Append	= 0,
+	OverWrite	= ( Append + 1 ) 
     } 	eFileMode;
 
 typedef /* [public][version][uuid] */  DECLSPEC_UUID("B687F83A-3BFC-46DF-ACBC-22789F22D34A") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0005
-    {
-        Signal_watch	= 0,
-        network_statistics	= ( Signal_watch + 1 ) ,
-        trace	= ( network_statistics + 1 ) ,
-        graph	= ( trace + 1 ) 
+    {	Signal_watch	= 0,
+	network_statistics	= ( Signal_watch + 1 ) ,
+	trace	= ( network_statistics + 1 ) ,
+	graph	= ( trace + 1 ) 
     } 	eWindow;
 
 typedef /* [public][version][uuid] */  DECLSPEC_UUID("C73746FF-B6F1-49A9-82AD-ACD29318D86E") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0006
-    {
-        Active	= 0,
-        Passive	= ( Active + 1 ) ,
-        Simulation	= ( Passive + 1 ) 
+    {	Active	= 0,
+	Passive	= ( Active + 1 ) ,
+	Simulation	= ( Passive + 1 ) 
     } 	eControllerMode;
 
 typedef /* [public][version][uuid] */  DECLSPEC_UUID("CB996B66-3B04-49AF-BC24-5B0870CE4783") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0007
-    {
-        all	= 0,
-        timers	= ( all + 1 ) ,
-        key	= ( timers + 1 ) ,
-        message	= ( key + 1 ) ,
-        error	= ( message + 1 ) 
+    {	all	= 0,
+	timers	= ( all + 1 ) ,
+	key	= ( timers + 1 ) ,
+	message	= ( key + 1 ) ,
+	error	= ( message + 1 ) 
     } 	eHandlerType;
 
 typedef /* [public][version][uuid] */  DECLSPEC_UUID("966A2D62-9CC2-4E7A-BBA2-FF84426F30C2") 
 enum __MIDL___MIDL_itf_BUSMASTER_0000_0000_0008
-    {
-        Log	= 0,
-        Display	= ( Log + 1 ) 
+    {	Log	= 0,
+	Display	= ( Log + 1 ) 
     } 	EFILTERMODULE;
 
 typedef /* [public][public][public][version][uuid] */  DECLSPEC_UUID("4B92B469-C5A8-497C-B4ED-D533E4434292") struct __MIDL___MIDL_itf_BUSMASTER_0000_0000_0009
@@ -315,7 +303,6 @@ EXTERN_C const IID IID__IAppEvents;
         
     };
     
-    
 #else 	/* C style interface */
 
     typedef struct _IAppEventsVtbl
@@ -426,7 +413,6 @@ EXTERN_C const IID IID_IBusMasterApp;
             /* [in] */ USHORT usUniqueID) = 0;
         
     };
-    
     
 #else 	/* C style interface */
 
@@ -636,7 +622,6 @@ EXTERN_C const IID IID_ICANComm;
         
     };
     
-    
 #else 	/* C style interface */
 
     typedef struct ICANCommVtbl
@@ -803,7 +788,6 @@ EXTERN_C const IID IID_ICANLog;
             /* [out] */ IBusMasterApp **pApplication) = 0;
         
     };
-    
     
 #else 	/* C style interface */
 

@@ -24,9 +24,21 @@
     <ClInclude Include="CAN_OpenCAN_stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OpenCAN_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CAN_OpenCAN.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cobs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCAN_api.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="opencan_utils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

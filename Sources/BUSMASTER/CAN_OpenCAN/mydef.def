@@ -1,0 +1,7 @@
+LIBRARY
+
+EXPORTS
+   OpenCAN_Open=OpenCAN_Open
+   OpenCAN_Close=OpenCAN_Close
+   OpenCAN_WriteCAN=OpenCAN_WriteCAN
+   OpenCAN_ReadCAN=OpenCAN_ReadCAN
